@@ -1,6 +1,7 @@
 use aws_config::SdkConfig;
 use aws_sdk_s3 as s3;
-// using tokio::sync::OnceCell ensures that initialization happens only once, even in the presence of concurrency or parallelism
+// using tokio::sync::OnceCell ensures that
+// initialization happens only once, even in the presence of concurrency or parallelism
 use tokio::sync::OnceCell;
 
 async fn s3_conf() -> SdkConfig {

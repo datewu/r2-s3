@@ -1,4 +1,4 @@
-use r2_s3::presigned_put;
+use r2_s3::Client;
 use std::env;
 
 #[tokio::main]
@@ -8,8 +8,10 @@ async fn main() {
     args.next();
     let bucket = args.next().unwrap_or("my-bucket".to_string());
     let key = args.next().unwrap_or("test-fold/test-put".to_string());
+    let client = Client::new(&bucket).await;
 
-    let url = presigned_put(&bucket, &key, None)
+    let url = client
+        .presigned_put(&key, None)
         .await
         .expect("should be ok");
     println!("presign put url for {bucket} {key} is: \n'{url}'");
