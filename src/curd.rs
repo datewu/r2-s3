@@ -10,6 +10,20 @@ pub enum Errs {
 }
 
 impl super::Client {
+    pub async fn put_bytes(&self, key: &str, bs: Vec<u8>) -> Result<(), Errs> {
+        let bs = ByteStream::from(bs);
+        let _ = self
+            .s3
+            .put_object()
+            .bucket(&self.bucket)
+            .key(key)
+            .body(bs)
+            .send()
+            .await
+            .map_err(|e| Errs::PUT(e.to_string()))?;
+        Ok(())
+    }
+
     pub async fn put_file(&self, key: &str, path: impl AsRef<std::path::Path>) -> Result<(), Errs> {
         let bs = ByteStream::from_path(path)
             .await
