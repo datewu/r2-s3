@@ -15,6 +15,21 @@ pub enum Errs {
 }
 
 impl super::Client {
+    pub async fn put_bytes_with_ct(&self, key: &str, bs: Vec<u8>, ct: &str) -> Result<(), Errs> {
+        let bs = ByteStream::from(bs);
+        let _ = self
+            .s3
+            .put_object()
+            .bucket(&self.bucket)
+            .key(key)
+            .body(bs)
+            .content_type(ct)
+            .send()
+            .await
+            .map_err(|e| Errs::Put(e.to_string()))?;
+        Ok(())
+    }
+
     pub async fn put_bytes(&self, key: &str, bs: Vec<u8>) -> Result<(), Errs> {
         let bs = ByteStream::from(bs);
         let _ = self
@@ -23,6 +38,28 @@ impl super::Client {
             .bucket(&self.bucket)
             .key(key)
             .body(bs)
+            .send()
+            .await
+            .map_err(|e| Errs::Put(e.to_string()))?;
+        Ok(())
+    }
+
+    pub async fn put_file_with_ct(
+        &self,
+        key: &str,
+        path: impl AsRef<std::path::Path>,
+        ct: &str,
+    ) -> Result<(), Errs> {
+        let bs = ByteStream::from_path(path)
+            .await
+            .map_err(|e| Errs::ReadFile(e.to_string()))?;
+        let _ = self
+            .s3
+            .put_object()
+            .bucket(&self.bucket)
+            .key(key)
+            .body(bs)
+            .content_type(ct)
             .send()
             .await
             .map_err(|e| Errs::Put(e.to_string()))?;
