@@ -13,9 +13,9 @@ pub enum PreSignErr {
 // one weeks
 const DEFAULT_EXPIRE_IN: Duration = Duration::from_secs(60 * 60 * 24 * 7 - 30);
 
-/// Generate a presigned URL which expired in one week by default for a PUT request to S3.
-/// hopefully some worker will put the file to S3 in one week.
 impl super::Client {
+    /// Generate a presigned URL which expired in one week by default for a PUT request to S3.
+    /// hopefully some worker will put the file to S3 in one week.
     pub async fn presigned_put(
         &self,
         key: &str,

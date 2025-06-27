@@ -15,6 +15,7 @@ pub enum Errs {
 }
 
 impl super::Client {
+    /// put an object and specify the content type
     pub async fn put_bytes_with_ct(&self, key: &str, bs: Vec<u8>, ct: &str) -> Result<(), Errs> {
         let bs = ByteStream::from(bs);
         let _ = self
@@ -30,6 +31,7 @@ impl super::Client {
         Ok(())
     }
 
+    /// put an object with a key
     pub async fn put_bytes(&self, key: &str, bs: Vec<u8>) -> Result<(), Errs> {
         let bs = ByteStream::from(bs);
         let _ = self
@@ -44,6 +46,7 @@ impl super::Client {
         Ok(())
     }
 
+    /// put an file and specify the content type
     pub async fn put_file_with_ct(
         &self,
         key: &str,
@@ -66,6 +69,7 @@ impl super::Client {
         Ok(())
     }
 
+    /// put an file with a key
     pub async fn put_file(&self, key: &str, path: impl AsRef<std::path::Path>) -> Result<(), Errs> {
         let bs = ByteStream::from_path(path)
             .await
@@ -82,6 +86,7 @@ impl super::Client {
         Ok(())
     }
 
+    /// delete an object by key
     pub async fn delete(&self, key: &str) -> Result<(), Errs> {
         let _ = self
             .s3
@@ -94,6 +99,7 @@ impl super::Client {
         Ok(())
     }
 
+    /// delete objects by a prefix
     pub async fn batch_delete(&self, prefix: &str) -> Result<(), Errs> {
         let mut continuation_token = None;
         let client = &self.s3;
@@ -109,7 +115,7 @@ impl super::Client {
 
             let contents = list_objects_output.contents();
             if contents.is_empty() {
-                println!("No objects found with prefix '{}'.", prefix);
+                println!("No objects found with prefix '{prefix}'.");
                 break;
             }
 
@@ -119,7 +125,7 @@ impl super::Client {
                     match ObjectIdentifier::builder().key(key).build() {
                         Ok(obj) => objects_to_delete.push(obj),
                         Err(e) => {
-                            eprintln!("{}", e);
+                            eprintln!("{e}");
                             continue;
                         }
                     }
@@ -155,7 +161,7 @@ impl super::Client {
                         // Handle the error from `delete_builder.set_objects(...).build()`
                         // This part depends on how the SDK's `Delete::builder()` and `build()` methods return errors.
                         // For example, if `build()` returns a `Result<Delete, SomeErrorType>`:
-                        eprintln!("Error building delete payload: {:?}", build_error);
+                        eprintln!("Error building delete payload: {build_error:?}");
                         // Potentially break or return an error
                         break;
                     }
@@ -171,7 +177,7 @@ impl super::Client {
             }
         }
 
-        println!("Finished deleting objects with prefix '{}'.", prefix);
+        println!("Finished deleting objects with prefix '{prefix}'.");
         Ok(())
     }
 }
