@@ -24,11 +24,17 @@ async fn main() {
     let key = args.next().unwrap_or("your_key".to_string());
     let client = Client::new(&bucket).await;
 
+    // presign a object
     let url = client
         .presigned_put(&key, None)
         .await
         .expect("should be ok");
     println!("presign put url for {bucket} {key} is: \n'{url}'");
+
+    // delete the object
+    client.delete(&key).unwrap();
+
+    // ... see curd mod for more operators
 }
 
 ```
